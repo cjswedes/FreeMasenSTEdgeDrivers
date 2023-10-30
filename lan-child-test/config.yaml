@@ -1,0 +1,5 @@
+name: 'LAN Parent-child'
+packageKey: 'lan-parent-chiuld'
+permissions:
+  lan: {}
+  discovery: {}
