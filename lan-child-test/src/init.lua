@@ -1,6 +1,7 @@
 local Driver = require 'st.driver'
 local log = require 'log'
-local socket = require "socket"
+local cosock = require "cosock"
+local socket = cosock.socket
 local capabilities = require "st.capabilities"
 local st_device = require "st.device"
 local function disco(driver, opts, cont)
@@ -67,10 +68,24 @@ local function device_added(driver, device)
   end
 end
 
+local function device_init(driver, device)
+    cosock.spawn(function()
+      while true do
+        local time = math.random(45, 95)
+        device.thread:call_with_delay(time, function()
+          log.info_with({hub_logs=true}, "Doing coroutine error!!!!")
+          error("FAKE error")
+        end)
+        socket.sleep(time)
+      end
+    end)
+end
+
 local driver = Driver('Disco Forever', {
   discovery = disco,
   lifecycle_handlers = {
     added = device_added,
+    init = device_init
   },
   capability_handlers = {
     [capabilities.switch.ID] = {
