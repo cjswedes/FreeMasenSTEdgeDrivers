@@ -63,7 +63,7 @@ function TestCase:new(require_str, type)
 end
 
 --TODO store results on testcase itself?
-function TestCase:run()
+function TestCase:run_comparison_test()
 	local dk_res
 	local st_res
 	local test_result
@@ -82,6 +82,7 @@ function TestCase:run()
 		test_result = dk_res == st_res
 		--]]
 		--[[ Key order isn't always respected by dkjson and definitely not for nested objects]]
+		-- Note sorting is modifying test data as it runs, but it doesn't affect the roundtrip tests
 		recursive_sort(self.test_data)
 		local keyorder = key_order(self.test_data)
 		dk_res = dk.encode(self.test_data, {keyorder = keyorder})
@@ -95,6 +96,36 @@ function TestCase:run()
 	end
 
 	return test_result, dk_res, st_res
+end
+
+function TestCase:run_st_roundtrip_test()
+	local test_result, actual
+	if self.type == "encode" then
+		local enc = st.encode(self.test_data)
+		actual = st.decode(enc)
+		test_result = table_eq(self.test_data, actual)
+	elseif self.type == "decode" then
+		local dec = st.decode(self.test_data)
+		actual = st.encode(dec)
+		test_result = self.test_data == actual
+	end
+
+	return test_result, self.test_data, actual
+end
+
+function TestCase:run_dk_roundtrip_test()
+	local test_result, actual
+	if self.type == "encode" then
+		local enc = dk.encode(self.test_data)
+		actual = dk.decode(enc)
+		test_result = table_eq(self.test_data, actual)
+	elseif self.type == "decode" then
+		local dec = dk.decode(self.test_data)
+		actual = dk.encode(dec)
+		test_result = self.test_data == actual
+	end
+
+	return test_result, self.test_data, actual
 end
 
 local RunnerConfig = {
@@ -147,14 +178,43 @@ end
 
 function TestRunner:run_tests()
 	local num_pass = 0
-	print(string.format("Running %d tests...", #self.test_cases))
+	print(string.format("Running %d comparison tests...", #self.test_cases))
 	for i, test_case in ipairs(self.test_cases) do
-		local res, dk_res, st_res = test_case:run()
-		print(string.format("\t%s(%s):\t\t\t\t%s", test_case.type, test_case.test_name, res))
+		local res, dk_res, st_res = test_case:run_comparison_test()
+		print(string.format("\t%s(%s):%s", test_case.type, test_case.test_name, res))
 		if not res then
 			print(string.format("\t\ttest data: %s", utils.stringify_table(test_case.test_data)))
 			print(string.format("\t\tdkjson: %s", utils.stringify_table(dk_res)))
 			print(string.format("\t\tstjson: %s", utils.stringify_table(st_res)))
+		else
+		  num_pass = num_pass + 1
+		end
+	end
+	print(string.format("Passed %d/%d comparison tests. Note hand check the encode tests", num_pass, #self.test_cases))
+
+	num_pass = 0
+	print(string.format("Running %d st roundtrip tests...", #self.test_cases))
+	for i, test_case in ipairs(self.test_cases) do
+		local res, expected, actual = test_case:run_st_roundtrip_test()
+		print(string.format("\t%s(%s):%s", test_case.type, test_case.test_name, res))
+		if not res then
+			print(string.format("\t\tStarted with: %s", utils.stringify_table(expected)))
+			print(string.format("\t\tGot back: %s", utils.stringify_table(actual)))
+		else
+		  num_pass = num_pass + 1
+		end
+	end
+	print(string.format("Passed %d/%d tests", num_pass, #self.test_cases))
+
+
+	num_pass = 0
+	print(string.format("Running %d dk roundtrip tests...", #self.test_cases))
+	for i, test_case in ipairs(self.test_cases) do
+		local res, expected, actual = test_case:run_st_roundtrip_test()
+		print(string.format("\t%s(%s):%s", test_case.type, test_case.test_name, res))
+		if not res then
+			print(string.format("\t\tStarted with: %s", utils.stringify_table(expected)))
+			print(string.format("\t\tGot back: %s", utils.stringify_table(actual)))
 		else
 		  num_pass = num_pass + 1
 		end
