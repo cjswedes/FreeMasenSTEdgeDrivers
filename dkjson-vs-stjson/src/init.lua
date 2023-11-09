@@ -14,7 +14,7 @@ local function run_tests()
   local test = require "test"
   local runner = test.TestRunner:new()
   local config = test.RunnerConfig:new()
-    :num_encode_tests(0)
+    :num_encode_tests(7)
     :num_decode_tests(7)
   print("Registering test cases")
   runner:register_tests(config)

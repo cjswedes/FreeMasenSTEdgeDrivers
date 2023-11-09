@@ -6,6 +6,42 @@ local function table_eq(exp, other)
 	return utils.stringify_table(exp) == utils.stringify_table(other)
 end
 
+--This might be not working, but it could be due to ordering 
+-- in dkjson that it is failing. I dont think iteration should matter
+-- since we recurse to lowest level table before modifying anything in place
+local function recursive_sort(tbl)
+	for k, v in pairs(tbl) do
+		if type(v) == "table" then
+			recursive_sort(v)
+		end
+	end
+	table.sort(tbl)
+end
+
+--handles two levels of nesting, which is all we need for test data
+local function nested_sort(tbl)
+	table.sort(tbl)
+	for k, v in pairs(tbl) do
+		if type(v) == "table" then
+			table.sort(v)
+			for k, v in pairs(tbl) do
+				if type(v) == "table" then
+					table.sort(v)
+				end
+			end
+		end
+	end
+end
+
+local function key_order(tbl)
+	local res = {}
+	for k, v in pairs(tbl) do
+		table.insert(res, k)
+	end
+	table.sort(res)
+	return res
+end
+
 --TODO handle test cases with expected errors
 --- Each test case is its own lua file that returns a table with
 --- the fields `description` and `data`
@@ -26,17 +62,33 @@ function TestCase:new(require_str, type)
   return o
 end
 
+--TODO store results on testcase itself?
 function TestCase:run()
 	local dk_res
 	local st_res
 	local test_result
 	if self.type == "encode" then
+		--[[ These seem to all pass when they shouldn't
+		local dk_enc = dk.encode(self.test_data)
+		local st_enc = st.encode(self.test_data)
+		dk_res = dk.decode(st_enc)
+		st_res = st.decode(dk_enc)
+		test_result = table_eq(dk_res, st_res)
+		--]]
+		--[[ Some of these fail because ordering is not deteminant in dkjson
+		nested_sort(self.test_data)
 		dk_res = dk.encode(self.test_data)
 		st_res = st.encode(self.test_data)
 		test_result = dk_res == st_res
+		--]]
+		--[[ Key order isn't always respected by dkjson and definitely not for nested objects]]
+		recursive_sort(self.test_data)
+		local keyorder = key_order(self.test_data)
+		dk_res = dk.encode(self.test_data, {keyorder = keyorder})
+		st_res = st.encode(self.test_data)
+		test_result = dk_res == st_res
+		--]]
 	elseif self.type == "decode" then
-		-- dk_res = utils.stringify_table(dk.decode(self.test_data))
-		-- st_res = utils.stringify_table(st.decode(self.test_data))
 		dk_res = dk.decode(self.test_data)
 		st_res = st.decode(self.test_data)
 		test_result = table_eq(dk_res, st_res)
@@ -98,10 +150,11 @@ function TestRunner:run_tests()
 	print(string.format("Running %d tests...", #self.test_cases))
 	for i, test_case in ipairs(self.test_cases) do
 		local res, dk_res, st_res = test_case:run()
-		print(string.format("TestCase(%s):\t\t%s", test_case.test_name, res))
+		print(string.format("\t%s(%s):\t\t\t\t%s", test_case.type, test_case.test_name, res))
 		if not res then
-			print(string.format("\tdkjson: %s", utils.stringify_table(dk_res)))
-			print(string.format("\tstjson: %s", utils.stringify_table(st_res)))
+			print(string.format("\t\ttest data: %s", utils.stringify_table(test_case.test_data)))
+			print(string.format("\t\tdkjson: %s", utils.stringify_table(dk_res)))
+			print(string.format("\t\tstjson: %s", utils.stringify_table(st_res)))
 		else
 		  num_pass = num_pass + 1
 		end
