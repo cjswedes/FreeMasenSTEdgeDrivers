@@ -1,0 +1,5 @@
+name: 'dkjson vs stjson'
+packageKey: 'dkjson-vs-stjson'
+permissions:
+  lan: {}
+  discovery: {}

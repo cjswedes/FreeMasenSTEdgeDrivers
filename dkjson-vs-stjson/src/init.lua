@@ -1,8 +1,27 @@
 local Driver = require 'st.driver'
 local log = require 'log'
-local socket = require "socket"
+local cosock = require "cosock"
+local socket = cosock.socket
 local capabilities = require "st.capabilities"
 local st_device = require "st.device"
+
+-- local old_print = print
+-- print = function(...)
+--   log.info_with({hub_logs = true}, ...)
+-- end
+
+local function run_tests()
+  local test = require "test"
+  local runner = test.TestRunner:new()
+  local config = test.RunnerConfig:new()
+    :num_encode_tests(0)
+    :num_decode_tests(7)
+  print("Registering test cases")
+  runner:register_tests(config)
+  runner:run_tests()
+end
+
+--- Discover a single device once
 local function disco(driver, opts, cont)
   print('starting disco', cont)
   local device_list = driver.device_api.get_device_list()
@@ -11,7 +30,7 @@ local function disco(driver, opts, cont)
     local device_info = {
         type = 'LAN',
         device_network_id = string.format('parent-%s', os.time()),
-        label = 'lan-parent',
+        label = 'dkjson vs stjson',
         profile = 'basic',
         manufacturer = "asdf",
         model = "fdsa",
@@ -37,40 +56,20 @@ local function handle_level(driver, device, cmd)
   end
 end
 local function handle_refresh(driver, device, cmd)
-  device.log.info("handle_refresh")
-  device:online()
+  run_tests()
 end
 
-local NUM_CHILDREN = 3
-
-local function device_added(driver, device)
-  device:emit_event(capabilities.switch.switch.on())
-  device:emit_event(capabilities.switchLevel.level(0))
-
-  if device.network_type ~= st_device.NETWORK_TYPE_CHILD then
-    -- create 3 children
-    for i=1, NUM_CHILDREN do
-      local child_metadata = {
-        type = "EDGE_CHILD",
-        label = string.format("Child %s", i),
-        vendor_provided_label = string.format("LAN Child"),
-        profile = "basic",
-        manufacturer = "asdf",
-        model = "fdsa",
-        parent_device_id = device.id,
-        parent_assigned_child_key = string.format("%s", i),
-      }
-
-      driver:try_create_device(child_metadata)
-      socket.sleep(1)
-    end
-  end
+local function device_init(driver, device)
+  log.info("spawning test runner")
+  cosock.spawn(function()
+    run_tests()
+  end)
 end
 
-local driver = Driver('Lan Child Test', {
+local driver = Driver('dk vs st json', {
   discovery = disco,
   lifecycle_handlers = {
-    added = device_added,
+    init = device_init,
   },
   capability_handlers = {
     [capabilities.switch.ID] = {
