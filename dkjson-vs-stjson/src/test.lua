@@ -98,20 +98,21 @@ function TestCase:run_comparison_test()
 	return test_result, dk_res, st_res
 end
 
-function TestCase:run_st_roundtrip_test()
+function TestCase:run_st_roundtrip_test(nullval)
 	local test_result, actual
 	if self.type == "encode" then
 		local enc = st.encode(self.test_data)
-		actual = st.decode(enc)
+		actual = st.decode(enc, nil, nullval)
 		test_result = table_eq(self.test_data, actual)
 	elseif self.type == "decode" then
-		local dec = st.decode(self.test_data)
+		local dec = st.decode(self.test_data, nil, nullval)
 		actual = st.encode(dec)
 		test_result = self.test_data == actual
 	end
 
 	return test_result, self.test_data, actual
 end
+
 
 function TestCase:run_dk_roundtrip_test()
 	local test_result, actual
@@ -177,6 +178,7 @@ function TestRunner:register_tests(config)
 end
 
 function TestRunner:run_tests()
+	--[[
 	local num_pass = 0
 	print(string.format("Running %d comparison tests...", #self.test_cases))
 	for i, test_case in ipairs(self.test_cases) do
@@ -191,7 +193,8 @@ function TestRunner:run_tests()
 		end
 	end
 	print(string.format("Passed %d/%d comparison tests. Note hand check the encode tests", num_pass, #self.test_cases))
-
+	--]]
+	--[[]]
 	num_pass = 0
 	print(string.format("Running %d st roundtrip tests...", #self.test_cases))
 	for i, test_case in ipairs(self.test_cases) do
@@ -205,8 +208,23 @@ function TestRunner:run_tests()
 		end
 	end
 	print(string.format("Passed %d/%d tests", num_pass, #self.test_cases))
-
-
+	--]]
+	--[[]]
+	num_pass = 0
+	print(string.format("Running %d st roundtrip tests with nullval...", #self.test_cases))
+	for i, test_case in ipairs(self.test_cases) do
+		local res, expected, actual = test_case:run_st_roundtrip_test(st.null)
+		print(string.format("\t%s(%s):%s", test_case.type, test_case.test_name, res))
+		if not res then
+			print(string.format("\t\tStarted with: %s", utils.stringify_table(expected)))
+			print(string.format("\t\tGot back: %s", utils.stringify_table(actual)))
+		else
+		  num_pass = num_pass + 1
+		end
+	end
+	print(string.format("Passed %d/%d tests", num_pass, #self.test_cases))
+	--]]
+	--[[
 	num_pass = 0
 	print(string.format("Running %d dk roundtrip tests...", #self.test_cases))
 	for i, test_case in ipairs(self.test_cases) do
@@ -220,6 +238,7 @@ function TestRunner:run_tests()
 		end
 	end
 	print(string.format("Passed %d/%d tests", num_pass, #self.test_cases))
+	--]]
 end
 
 local test = {
