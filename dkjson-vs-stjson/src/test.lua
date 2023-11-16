@@ -194,7 +194,7 @@ function TestRunner:run_tests()
 	end
 	print(string.format("Passed %d/%d comparison tests. Note hand check the encode tests", num_pass, #self.test_cases))
 	--]]
-	--[[]]
+	--[[
 	num_pass = 0
 	print(string.format("Running %d st roundtrip tests...", #self.test_cases))
 	for i, test_case in ipairs(self.test_cases) do

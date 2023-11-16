@@ -5,10 +5,10 @@ local socket = cosock.socket
 local capabilities = require "st.capabilities"
 local st_device = require "st.device"
 
--- local old_print = print
--- print = function(...)
---   log.info_with({hub_logs = true}, ...)
--- end
+local old_print = print
+print = function(...)
+  log.info_with({hub_logs = true}, ...)
+end
 
 local function run_tests()
   local test = require "test"
@@ -43,24 +43,58 @@ end
 
 local function handle_off(driver, device, cmd)
   device.log.info("handle_off")
-  device:offline()
+  local stjson = require "st.json"
+  local empty_array = {}
+  setmetatable(empty_array, stjson.array_mt)
+  local empty_object = {}
+  local tbl = {
+    empty_array = empty_array,
+    empty_object = empty_object, 
+  }
+  local expected = '{"empty_array":[],"empty_object":{}}'
+  local actual = stjson.encode(tbl)
+  if expected ~= actual then
+    print(string.format("\t\tExpected: %s", expected))
+    print(string.format("\t\tActual: %s", actual))
+  end
 end
 local function handle_on(driver, device, cmd)
   device.log.info("handle_on")
+  local dkjson = require "dkjson"
+  local empty_array = {}
+  setmetatable(empty_array, {__jsontype = "array"})
+  local empty_object = {}
+  setmetatable(empty_object, {__jsontype = "object"})
+  local tbl = {
+    empty_array = empty_array,
+    empty_object = empty_object, 
+  }
+  local expected = '{"empty_array":[],"empty_object":{}}'
+  local actual = dkjson.encode(tbl)
+  if expected ~= actual then
+    print(string.format("\t\tExpected: %s", expected))
+    print(string.format("\t\tActual: %s", actual))
+  end
 end
 local function handle_level(driver, device, cmd)
   device.log.info("handle_level")
   device:emit_event(capabilities.switchLevel.level(cmd.args.level))
-  if cmd.args.level > 80 then
-    device:online()
-  end
+  print("!!!!! emitting empty presets event")
+  device:emit_event(capabilities.mediaPresets.presets({}))
+  print("!!!!! don emiting prestss eventS")
 end
+
 local function handle_refresh(driver, device, cmd)
-  run_tests()
+  local stjson = require "st.json"
+  local empty_array = {}
+  setmetatable(empty_array, stjson.array_mt)
+  print("!!!!! json.array_mt = %s, getmetatable = %s", stjson.array_mt, getmetatable(empty_array))
+  print("!!!!! json.array_mt = %s, getmetatable = %s", stjson.array_mt, debug.getmetatable(empty_array))
 end
 
 local function device_init(driver, device)
   log.info("spawning test runner")
+  device:try_update_metadata({profile = "array-basic"})
   cosock.spawn(function()
     run_tests()
   end)
