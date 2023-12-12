@@ -1,4 +1,3 @@
-# Lan child test
+# Cosock test
 
-Driver that Creates a parent with 3 children which can then
-all have online/offline health state set using switch capability
+Muck about with cosock channels and sockets and selects
