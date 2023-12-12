@@ -1,14 +1,9 @@
+local capabilities = require "st.capabilities"
 local Driver = require 'st.driver'
 local log = require 'log'
 local cosock = require "cosock"
 local socket = cosock.socket
-local capabilities = require "st.capabilities"
 local st_device = require "st.device"
-
-local old_print = print
-print = function(...)
-  log.info_with({hub_logs = true}, ...)
-end
 
 local function run_tests()
   local test = require "test"
@@ -42,7 +37,7 @@ local function disco(driver, opts, cont)
 end
 
 local function handle_off(driver, device, cmd)
-  device.log.info("handle_off")
+  device.log.debug("handle_off")
   local stjson = require "st.json"
   local empty_array = {}
   setmetatable(empty_array, stjson.array_mt)
@@ -59,7 +54,7 @@ local function handle_off(driver, device, cmd)
   end
 end
 local function handle_on(driver, device, cmd)
-  device.log.info("handle_on")
+  device.log.debug("handle_on")
   local dkjson = require "dkjson"
   local empty_array = {}
   setmetatable(empty_array, {__jsontype = "array"})
@@ -77,7 +72,7 @@ local function handle_on(driver, device, cmd)
   end
 end
 local function handle_level(driver, device, cmd)
-  device.log.info("handle_level")
+  device.log.debug("handle_level")
   device:emit_event(capabilities.switchLevel.level(cmd.args.level))
   print("!!!!! emitting empty presets event")
   device:emit_event(capabilities.mediaPresets.presets({}))
@@ -93,7 +88,7 @@ local function handle_refresh(driver, device, cmd)
 end
 
 local function device_init(driver, device)
-  log.info("spawning test runner")
+  log.debug("spawning test runner")
   device:try_update_metadata({profile = "array-basic"})
   cosock.spawn(function()
     run_tests()
