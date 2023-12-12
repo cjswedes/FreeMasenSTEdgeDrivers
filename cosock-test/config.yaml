@@ -1,0 +1,5 @@
+name: 'Cosock Test Driver'
+packageKey: 'cosock-test-driver'
+permissions:
+  lan: {}
+  discovery: {}
