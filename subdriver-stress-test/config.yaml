@@ -1,0 +1,5 @@
+name: 'Subdriver Stress Test'
+packageKey: 'subdriver-stress-test'
+permissions:
+  lan: {}
+  discovery: {}
