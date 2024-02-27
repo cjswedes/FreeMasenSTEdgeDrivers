@@ -1,0 +1,30 @@
+# hello-world-profile
+name: tryUpdateMetadata.v3
+components:
+- id: main
+  capabilities:
+  - id: switch
+    version: 1
+  - id: colorTemperature
+    version: 1
+  categories:
+  - name: MotionSensor
+metadata:
+  deviceType: Television
+  ocfDeviceType: oic.d.tv
+  deviceTypeId: Television
+preferences:
+  - name: "selectIcon"
+    title: "select device icon"
+    required: false
+    preferenceType: enumeration
+    definition:
+      options:
+        "none" : "none"
+        "oven" : "oven"
+        "motionSensor"  : "motionSensor"
+        "tv"  : "tv"
+        "colorTemperature": "colorTemperature different range"
+        "capsExclusion": "capsExclusion"
+        "capsExclusion2": "capsExclusion2"
+      default: "none"

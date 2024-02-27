@@ -1,0 +1,32 @@
+# hello-world-profile
+name: tryUpdateMetadata.v4
+components:
+- id: main
+  capabilities:
+  - id: switch
+    version: 1
+  - id: colorTemperature
+    version: 1
+  categories:
+  - name: MotionSensor
+metadata:
+  vid: 1491a1e5-b77e-3e8b-8fad-49ed566a5ca8
+  mnmn: SmartThingsCommunity
+  deviceType: Television
+  ocfDeviceType: oic.d.tv
+  deviceTypeId: Television
+preferences:
+  - name: "selectIcon"
+    title: "select device icon"
+    required: false
+    preferenceType: enumeration
+    definition:
+      options:
+        "none" : "none"
+        "oven" : "oven"
+        "motionSensor"  : "motionSensor"
+        "tv"  : "tv"
+        "colorTemperature": "colorTemperature different range"
+        "capsExclusion": "capsExclusion"
+        "capsExclusion2": "capsExclusion2"
+      default: "none"

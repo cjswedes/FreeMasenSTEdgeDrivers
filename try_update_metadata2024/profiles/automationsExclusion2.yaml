@@ -1,0 +1,25 @@
+# hello-world-profile
+name: startTemp
+components:
+- id: main
+  capabilities:
+  - id: smokeDetector
+    version: 1
+  - id: thermostatMode
+    version: 1
+  - id: temperatureMeasurement
+    version: 1
+  - id: refresh
+    version: 1
+  categories:
+  - name: Switch
+preferences:
+  - name: "selectIcon"
+    title: "select device icon"
+    required: false
+    preferenceType: enumeration
+    definition:
+      options:
+        "startSwitch": "startSwitch"
+        "startTemp": "startTemp"
+      default: "startTemp"

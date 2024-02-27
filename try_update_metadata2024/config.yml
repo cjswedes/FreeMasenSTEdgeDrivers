@@ -1,0 +1,5 @@
+name: 'tryUpdateMetadata2024'
+packageKey: 'tryUpdateMetadata2024'
+permissions:
+  lan: {}
+  discovery: {}

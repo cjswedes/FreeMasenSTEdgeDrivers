@@ -1,0 +1,28 @@
+# hello-world-profile
+name: startSwitch
+components:
+- id: main
+  capabilities:
+  - id: smokeDetector
+    version: 1
+  - id: thermostatMode
+    version: 1
+  - id: switch
+    version: 1
+  - id: refresh
+    version: 1
+  categories:
+  - name: Switch
+metadata:
+  vid: ce368439-303c-3028-b3ad-5c96ca7ac491
+  mnmn: SmartThingsCommunity
+preferences:
+  - name: "selectIcon"
+    title: "select device icon"
+    required: false
+    preferenceType: enumeration
+    definition:
+      options:
+        "startSwitch": "startSwitch"
+        "startTemp": "startTemp"
+      default: "startSwitch"
