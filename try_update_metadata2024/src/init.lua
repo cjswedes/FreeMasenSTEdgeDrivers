@@ -10,8 +10,6 @@ local discovery = require "discovery"
 
 
 local function initialize(driver, device)
-  device:emit_event(capabilities.thermostatMode.thermostatMode("off"))
-  device:emit_event(capabilities.smokeDetector.smoke("clear"))
   device:emit_event(capabilities.switch.switch.on())
   device:emit_event(capabilities.temperatureMeasurement.temperature({value=12, unit="C"}))
 end
@@ -19,6 +17,8 @@ end
 -- this is called once a device is added by the cloud and synchronized down to the hub
 local function device_added(driver, device)
   log.info("[" .. device.id .. "] Adding new Hello World device")
+  device:emit_event(capabilities.thermostatMode.thermostatMode("off"))
+  device:emit_event(capabilities.smokeDetector.smoke("clear"))
   initialize(driver, device)
 end
 
@@ -26,6 +26,8 @@ end
 local function device_init(driver, device)
   log.info("[" .. device.id .. "] Initializing Hello World device")
   -- mark device as online so it can be controlled from the app
+  device:emit_event(capabilities.thermostatMode.thermostatMode("off"))
+  device:emit_event(capabilities.smokeDetector.smoke("clear"))
   initialize(driver, device)
   device:online()
 end
