@@ -1,5 +1,5 @@
-name: 'Subdriver Stress Test'
-packageKey: 'subdriver-stress-test'
+name: 'Subdriver NONE'
+packageKey: 'subdriver-stress-test-none'
 permissions:
   lan: {}
   discovery: {}

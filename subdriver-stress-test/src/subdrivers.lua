@@ -19,7 +19,7 @@ local subdrivers = {}
 if config.CAN_HANDLE_DISTRIBUTION == "UNIFORM" then
 	for i=1,config.NUM_DEVICES do
 		local can_handle = function(opts, driver, device)
-			local device_num = string.match(device.device_network_id, "device (%d)")
+			local device_num = string.match(device.device_network_id, string.format("%s (%%d)", config.CAN_HANDLE_DISTRIBUTION))
 			return i == tonumber(device_num or 0)
 		end
 		table.insert(subdrivers, i, generate_subdriver(string.format("Subdriver %s", i), can_handle))
