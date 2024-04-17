@@ -1,5 +1,5 @@
-name: 'Subdriver NONE'
-packageKey: 'subdriver-stress-test-none'
+name: 'Subdriver HealthState Changes'
+packageKey: 'subdriver-stress-test-healthstate'
 permissions:
   lan: {}
   discovery: {}
