@@ -1,0 +1,5 @@
+name: 'Lan Test Driver'
+packageKey: 'lan-test-driver'
+permissions:
+  lan: {}
+  discovery: {}
