@@ -11,7 +11,7 @@
 -- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
-local lite_enabled = true
+local lite_enabled = false
 
 local capabilities = require "st.capabilities"
 local ZigbeeDriver 
@@ -31,6 +31,10 @@ end
 
 local do_configure = function(self, device)
   device.log.info_with({hub_logs=true}, "do_configure")
+end
+
+local driver_switch = function(self, device)
+  device.log.info_with({hub_logs=true}, "driver_switch")
 end
 
 local function component_to_endpoint(device, component_id)
@@ -62,6 +66,14 @@ local function device_added(driver, device, event)
   device.log.info_with({hub_logs=true}, "device_added")
 end
 
+local function maybe_require_lite(str)
+  if lite_enabled then
+    return require(str .. "_lite")
+  else
+    return require(str)
+  end
+end
+
 local zigbee_switch_driver_template = {
   zigbee_handlers = {
     attr = {
@@ -72,8 +84,8 @@ local zigbee_switch_driver_template = {
   },
   capability_handlers = {
     [capabilities.switch.ID] = {
-      [capabilities.switch.commands.on.NAME] = require("on"),
-      [capabilities.switch.commands.off.NAME] = require("off"),
+      [capabilities.switch.commands.on.NAME] = maybe_require_lite("on"),
+      [capabilities.switch.commands.off.NAME] = maybe_require_lite("off"),
     }
   },
   current_config_version = 1,
@@ -82,6 +94,7 @@ local zigbee_switch_driver_template = {
     added = device_added,
     infoChanged = info_changed,
     doConfigure = do_configure,
+    driverSwitched = driver_switch,
   },
   health_check = false,
 }
