@@ -1,11 +1,6 @@
 local Driver = require 'st.driver'
 local log = require 'log'
 local capabilities = require "st.capabilities"
-local socket = require "cosock.socket"
--- local socket = require "cosock.socket"
--- local cosock = require "cosock"
--- local st_device = require "st.device"
--- local utils = require "st.utils"
 
 local function disco(driver, opts, cont)
   print('starting disco', cont)
@@ -29,21 +24,21 @@ end
 local function handle_off(driver, device, cmd)
   log.info("handle_off")
   device:emit_event(capabilities.switch.switch.off())
-  driver.tcp_sock = socket.tcp()
 end
 local function handle_on(driver, device, cmd)
   log.info("handle_on")
   device:emit_event(capabilities.switch.switch.on())
-  driver.udp_sock = socket.udp()
 end
 local function handle_level(driver, device, cmd)
   log.info("handle_level")
   device:emit_event(capabilities.switchLevel.level(cmd.args.level))
-  driver.zwave_sock = socket.zwave()
 end
 
 local function handle_refresh(driver, device, cmd)
   log.info_with({hub_logs=true}, "handle_refresh")
+  if driver.ssl == nil then
+    driver.ssl = require "cosock.ssl"
+  end
 end
 
 local function device_added(driver, device)
