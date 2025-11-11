@@ -65,7 +65,7 @@ local driver = Driver('Lan test driver', {
       [capabilities.refresh.commands.refresh.NAME] = handle_refresh,
     },
   },
-  use_single_devices_thread = true,
+  shared_device_thread_enabled = true,
 })
 
 log.debug('Starting lan parent child driver')
