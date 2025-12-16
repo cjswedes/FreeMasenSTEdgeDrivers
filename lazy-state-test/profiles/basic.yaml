@@ -16,3 +16,10 @@ preferences:
     preferenceType: boolean
     definition:
       default: false
+  - name: "doStateAccess"
+    title: "access state"
+    description: "access state cache"
+    required: false
+    preferenceType: boolean
+    definition:
+      default: false
