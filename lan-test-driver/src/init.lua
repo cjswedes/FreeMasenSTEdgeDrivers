@@ -4,8 +4,8 @@ local capabilities = require "st.capabilities"
 local socket = require "cosock.socket"
 
 local function disco(driver, opts, cont)
-  local NUM_DEVICES = 40
-  print('starting disco', cont)
+  local NUM_DEVICES = 6
+  print('starting disco', cont())
   local device_list = driver.device_api.get_device_list()
   if not next(device_list) and cont() then
     print('discovering a devices')
@@ -41,11 +41,12 @@ end
 
 local function handle_refresh(driver, device, cmd)
   log.info_with({hub_logs=true}, "handle_refresh")
+  error("doing an error")
 end
 
 local function device_added(driver, device)
   device:emit_event(capabilities.switch.switch.on())
-  device:emit_event(capabilities.switchLevel.level(0))
+  device:emit_event(capabilities.switchLevel.level(1))
 end
 
 local driver = Driver('Lan test driver', {
@@ -69,4 +70,4 @@ local driver = Driver('Lan test driver', {
 })
 
 log.debug('Starting lan parent child driver')
-driver:run()
+driver:run(true)
