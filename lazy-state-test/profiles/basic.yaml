@@ -1,0 +1,18 @@
+name: basic
+components:
+  - id: main
+    capabilities:
+    - id: switch
+      version: 1
+    - id: switchLevel
+      version: 1
+    - id: refresh
+      version: 1
+preferences:
+  - name: "testDirectIdx"
+    title: "test direct indexing"
+    description: "Dont use get_latest_state"
+    required: false
+    preferenceType: boolean
+    definition:
+      default: false

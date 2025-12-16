@@ -1,0 +1,5 @@
+name: 'Lazy state test'
+packageKey: 'lazy-state-test'
+permissions:
+  lan: {}
+  discovery: {}
