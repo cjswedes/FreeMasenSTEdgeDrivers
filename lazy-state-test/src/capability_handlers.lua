@@ -52,12 +52,12 @@ local function handle_refresh(driver, device, cmd)
     device.log.info_with({hub_logs = true}, "size of device.state_cache = ".. tostring(utils.table_size(device.state_cache) or 999))
   end
 
-  if device.preference.doStateAccess then
+  if device.preferences.doStateAccess then
     device.log.info_with({hub_logs=true}, utils.stringify_table(device.state_cache.main, "device.state_cache.main", true))
   end
 end
 
-
+ 
 return {
   [capabilities.switch.ID] = {
     [capabilities.switch.commands.on.NAME] = handle_on,

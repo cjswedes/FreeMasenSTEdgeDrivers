@@ -70,6 +70,7 @@ local function device_init(driver, device)
   end
   device:emit_event(capabilities.switch.switch.on())
   device:emit_event(capabilities.switchLevel.level(50))
+  log.info_with({hub_logs=true},"lazy_device_state_config is: "..utils.stringify_table((driver.hub_augmented_driver_data or {}).lazy_device_state_config))
 end
 
 local subdrivers = require "subdrivers"
