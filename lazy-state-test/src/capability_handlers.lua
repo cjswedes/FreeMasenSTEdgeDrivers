@@ -2,41 +2,43 @@ local capabilities = require "st.capabilities"
 local utils = require "st.utils"
 
 local function get_device_num(device)
-  return tonumber(string.match(device.device_network_id, ".+ (%d+)"))
+  return tonumber(string.match(device.device_network_id, ".+ (%d+)")) or 0
 end
 
 local function handle_off(driver, device, cmd)
   device.log.info_with({hub_logs=true}, "handle_off")
-  device:emit_event(capabilities.switch.switch.off())
-
   if device.preferences.doStateAccess then
     if get_device_num(device) % 2 == 0 then
       device.log.info_with({hub_logs=true}, "get_latest_state switch: "..device:get_latest_state("main", "switch", "switch", "unknown"))
     else
-      device.log.info_with({hub_logs=true}, "direct index: "..tostring(device.state_cache.main.switch.switch))
+      device.log.info_with({hub_logs=true}, "direct index: "..utils.stringify_table(device.state_cache.main.switch.switch))
     end
+  else
+    device:emit_event(capabilities.switch.switch.off())
   end
 end
 local function handle_on(driver, device, cmd)
   device.log.info_with({hub_logs=true}, "handle_on")
-  device:emit_event(capabilities.switch.switch.on())
   if device.preferences.doStateAccess then
     if get_device_num(device) % 2 == 0 then
       device.log.info_with({hub_logs=true}, "get_latest_state switch: "..device:get_latest_state("main", "switch", "switch", "unknown"))
     else
-      device.log.info_with({hub_logs=true}, "direct index: "..tostring(device.state_cache.main.switch.switch))
+      device.log.info_with({hub_logs=true}, "direct index: "..utils.stringify_table(device.state_cache.main.switch.switch))
     end
+  else
+    device:emit_event(capabilities.switch.switch.on())
   end
 end
 local function handle_level(driver, device, cmd)
   device.log.info_with({hub_logs=true}, "handle_level")
-  device:emit_event(capabilities.switchLevel.level(cmd.args.level))
   if device.preferences.doStateAccess then
     if get_device_num(device) % 2 == 0 then
       device.log.info_with({hub_logs=true}, "get_latest_state swtichLevel: "..device:get_latest_state("main", "switchLevel", "level", "unknown"))
     else
-      device.log.info_with({hub_logs=true}, "direct index: "..tostring(device.state_cache.main.switchLevel.level))
+      device.log.info_with({hub_logs=true}, "direct index: "..utils.stringify_table(device.state_cache.main.switchLevel.level))
     end
+  else
+    device:emit_event(capabilities.switchLevel.level(cmd.args.level))
   end
 end
 local function handle_refresh(driver, device, cmd)
@@ -48,11 +50,12 @@ local function handle_refresh(driver, device, cmd)
   else
     device.log.info_with({hub_logs=true}, "state cache is somewhere else")
   end
-  if device.preferences.testDirectIdx and device.preferences.doStateAccess then
+  if device.preferences.testDirectIdx or device.preferences.doStateAccess then
     device.log.info_with({hub_logs = true}, "size of device.state_cache = ".. tostring(utils.table_size(device.state_cache) or 999))
   end
 
   if device.preferences.doStateAccess then
+    -- Note that doing this indexing actually requests the entire component
     device.log.info_with({hub_logs=true}, utils.stringify_table(device.state_cache.main, "device.state_cache.main", true))
   end
 end
