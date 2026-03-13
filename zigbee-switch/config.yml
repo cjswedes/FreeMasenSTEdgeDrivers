@@ -1,0 +1,6 @@
+name: 'Zigbee Config Monitor Test'
+packageKey: 'zigbee-cfg-monitor-test'
+permissions:
+  zigbee: {}
+description: "SmartThings driver for Zigbee switch devices"
+vendorSupportInformation: "https://support.smartthings.com"
